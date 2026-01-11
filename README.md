@@ -123,6 +123,43 @@ Together, these components create a **self-healing compute instance** that survi
              │ Freeze/Isolation   │
              └────────────────────┘
 ```
+flowchart TD
+
+    %% Style
+    classDef box fill:#1f2937,stroke:#4b5563,stroke-width:1px,color:#f3f4f6;
+    classDef layer fill:#111827,stroke:#4b5563,stroke-width:1px,color:#f3f4f6;
+    classDef accent fill:#0f766e,stroke:#064e3b,stroke-width:1px,color:#ecfdf5;
+
+    %% Hypervisor Layer
+    A[Oracle Cloud Host<br/>(Unstable Hypervisor Layer)]:::layer
+
+    %% VM Layer
+    B[Ubuntu 22.04 VM<br/>AMD E2.1.Micro Shape]:::box
+
+    %% Hardening Components
+    C1[Swap Layer<br/>(1–2 GB)]:::accent
+    C2[Kernel Auto-Recovery<br/>(panic + oops handlers)]:::accent
+    C3[Hardware Watchdog<br/>(/dev/watchdog)]:::accent
+    C4[Network Heartbeat Watchdog<br/>(auto-reboot on isolation)]:::accent
+    C5[Service Optimization<br/>(snapd, multipathd, lvm2)]:::accent
+
+    %% Final Output
+    D[Self-Healing VM<br/>Resilient to Host Instability]:::layer
+
+    %% Connections
+    A --> B
+
+    B --> C1
+    B --> C2
+    B --> C3
+    B --> C4
+    B --> C5
+
+    C1 --> D
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    C5 --> D
 
 ---
 
