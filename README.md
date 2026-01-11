@@ -123,6 +123,9 @@ Together, these components create a **self-healing compute instance** that survi
              │ Freeze/Isolation   │
              └────────────────────┘
 ```
+
+---
+
 flowchart TD
 
     %% Style
@@ -161,7 +164,7 @@ flowchart TD
     C4 --> D
     C5 --> D
 
----
+
 
 # 🔧 **Hardening Steps**
 
