@@ -120,46 +120,6 @@ Together, these components create a **self-healing compute instance** that survi
 
 ---
 
-sequenceDiagram
-    autonumber
-
-    participant Host as OCI Hypervisor
-    participant VM as Ubuntu VM<br/>E2.1.Micro
-    participant Swap as Swap Layer
-    participant Kernel as Kernel Auto-Recovery
-    participant HW as Hardware Watchdog<br/>(/dev/watchdog)
-    participant NetWD as Network Watchdog<br/>(ping monitor)
-    participant Services as Optimized Services
-    participant User as User / Admin
-
-    Note over Host: Periodic instability<br/>CPU steal, host resets, network stalls
-
-    Host->>VM: Causes freeze / partial hang
-    VM->>Swap: Attempt to allocate memory
-    Swap-->>VM: Provides fallback memory<br/>prevents OOM stalls
-
-    Host->>VM: Hard freeze or scheduler stall
-    VM->>HW: Heartbeat stops responding
-    HW-->>VM: Force reboot triggered
-
-    Host->>VM: Network isolation occurs
-    VM->>NetWD: ping 8.8.8.8 fails 3 times
-    NetWD-->>VM: Reboot -f
-
-    Host->>VM: Kernel fault or oops
-    VM->>Kernel: panic_on_oops=1
-    Kernel-->>VM: Auto-reboot after 10s
-
-    User->>Services: Disable snapd, multipathd, lvm2
-    Services-->>VM: Reduced load, fewer stalls
-
-    VM-->>User: System recovers automatically
-    User->>VM: Continues normal operations
-
-    Note over VM,User: Result: Self-healing VM<br/>survives host instability
-
-
-
 # 🔧 **Hardening Steps**
 
 ## **1. Add Swap**
