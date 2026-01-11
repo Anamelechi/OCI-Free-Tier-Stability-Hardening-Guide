@@ -1,9 +1,3 @@
-Absolutely, Philz — here’s a **fully polished, GitHub‑ready README** with badges, a clean architecture diagram (ASCII‑safe for GitHub), visual sections, and a professional structure that fits perfectly into a cloud‑engineering portfolio.
-
-You can paste this directly into a `README.md` file.
-
----
-
 # **OCI Free Tier Stability Hardening Guide**  
 ### *Stabilizing AMD E2.1.Micro Instances Without Migration*
 
@@ -126,43 +120,43 @@ Together, these components create a **self-healing compute instance** that survi
 
 ---
 
-flowchart TD
+sequenceDiagram
+    autonumber
 
-    %% Style
-    classDef box fill:#1f2937,stroke:#4b5563,stroke-width:1px,color:#f3f4f6;
-    classDef layer fill:#111827,stroke:#4b5563,stroke-width:1px,color:#f3f4f6;
-    classDef accent fill:#0f766e,stroke:#064e3b,stroke-width:1px,color:#ecfdf5;
+    participant Host as OCI Hypervisor
+    participant VM as Ubuntu VM<br/>E2.1.Micro
+    participant Swap as Swap Layer
+    participant Kernel as Kernel Auto-Recovery
+    participant HW as Hardware Watchdog<br/>(/dev/watchdog)
+    participant NetWD as Network Watchdog<br/>(ping monitor)
+    participant Services as Optimized Services
+    participant User as User / Admin
 
-    %% Hypervisor Layer
-    A[Oracle Cloud Host<br/>(Unstable Hypervisor Layer)]:::layer
+    Note over Host: Periodic instability<br/>CPU steal, host resets, network stalls
 
-    %% VM Layer
-    B[Ubuntu 22.04 VM<br/>AMD E2.1.Micro Shape]:::box
+    Host->>VM: Causes freeze / partial hang
+    VM->>Swap: Attempt to allocate memory
+    Swap-->>VM: Provides fallback memory<br/>prevents OOM stalls
 
-    %% Hardening Components
-    C1[Swap Layer<br/>(1–2 GB)]:::accent
-    C2[Kernel Auto-Recovery<br/>(panic + oops handlers)]:::accent
-    C3[Hardware Watchdog<br/>(/dev/watchdog)]:::accent
-    C4[Network Heartbeat Watchdog<br/>(auto-reboot on isolation)]:::accent
-    C5[Service Optimization<br/>(snapd, multipathd, lvm2)]:::accent
+    Host->>VM: Hard freeze or scheduler stall
+    VM->>HW: Heartbeat stops responding
+    HW-->>VM: Force reboot triggered
 
-    %% Final Output
-    D[Self-Healing VM<br/>Resilient to Host Instability]:::layer
+    Host->>VM: Network isolation occurs
+    VM->>NetWD: ping 8.8.8.8 fails 3 times
+    NetWD-->>VM: Reboot -f
 
-    %% Connections
-    A --> B
+    Host->>VM: Kernel fault or oops
+    VM->>Kernel: panic_on_oops=1
+    Kernel-->>VM: Auto-reboot after 10s
 
-    B --> C1
-    B --> C2
-    B --> C3
-    B --> C4
-    B --> C5
+    User->>Services: Disable snapd, multipathd, lvm2
+    Services-->>VM: Reduced load, fewer stalls
 
-    C1 --> D
-    C2 --> D
-    C3 --> D
-    C4 --> D
-    C5 --> D
+    VM-->>User: System recovers automatically
+    User->>VM: Continues normal operations
+
+    Note over VM,User: Result: Self-healing VM<br/>survives host instability
 
 
 
